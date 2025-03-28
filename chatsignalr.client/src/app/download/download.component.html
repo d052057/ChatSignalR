@@ -1,0 +1,21 @@
+<div class="container">
+  <input type="url" [(ngModel)]="url" placeholder="Enter URL" class="form-control" />
+  <label>
+    <input type="checkbox" [(ngModel)]="audioOnly" class="form-check-input" />
+    Audio Only
+  </label>
+  <div class="row">
+    <!-- New: Input for output folder -->
+    <input type="text" [(ngModel)]="outputFolder" placeholder="Output folder (e.g., C:\medias\poster)" />
+  </div>
+  <div class="row">
+    <button type="button" (click)="startDownload()" class="btn btn-primary">Download</button>
+  </div>
+  <div *ngIf="progress" class="progress">
+    Progress: {{ progress }}
+  </div>
+  <div *ngIf="error" class="error">
+    Error: {{ error }}
+  </div>
+</div>
+
