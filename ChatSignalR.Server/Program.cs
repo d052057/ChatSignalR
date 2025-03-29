@@ -23,6 +23,7 @@ builder.Services.AddSignalR(opt =>
     { 
     opt.EnableDetailedErrors = true; 
     });
+builder.Services.AddHttpClient();
 builder.Services.AddSingleton<DownloadService>(); // Registers the DownloadService as a singleton
 builder.Services.AddHttpContextAccessor(); // Required for accessing HTTP context, like connection IDs
 builder.Services.AddCors();

@@ -7,6 +7,7 @@ using YoutubeDLSharp.Metadata;
 using YoutubeDLSharp.Options;
 using ChatSignalR.Server.Dto;
 using ChatSignalR.Server.Hubs;
+using System.Text.RegularExpressions;
 namespace ChatSignalR.Server.Service
 {
     public class DownloadService
@@ -26,7 +27,7 @@ namespace ChatSignalR.Server.Service
             };
         }
 
-        public async Task StartDownloadAsync(string connectionId, string url, bool audioOnly, string outputFolder)
+        public async Task StartDownloadAsync(string connectionId, string url, bool audioOnly, string outputFolder, Func<int, Task> onProgress)
         {
             try
             {
@@ -50,10 +51,25 @@ namespace ChatSignalR.Server.Service
 
                 process.OutputDataReceived += async (sender, args) =>
                 {
+                    //if (!string.IsNullOrEmpty(args.Data))
+                    //{
+                    //    await _hubContext.Clients.Client(connectionId)
+                    //        .SendAsync("ReceiveProgress", args.Data);
+                    //}
                     if (!string.IsNullOrEmpty(args.Data))
                     {
+                        // Extract progress (if applicable) from the output
+                        int progress = ParseProgress(args.Data);
+
+                        // Send progress to SignalR client
                         await _hubContext.Clients.Client(connectionId)
                             .SendAsync("ReceiveProgress", args.Data);
+
+                        // Call the onProgress callback if it's provided
+                        if (onProgress != null)
+                        {
+                            await onProgress(progress);
+                        }
                     }
                 };
 
@@ -83,5 +99,13 @@ namespace ChatSignalR.Server.Service
                     .SendAsync("ReceiveError", $"An error occurred: {ex.Message}");
             }
         }
+        private int ParseProgress(string output)
+        {
+            // Example parsing logic (adapt to yt-dlp output format)
+            // For instance, yt-dlp might output something like "Downloading: 50%"
+            var match = Regex.Match(output, @"(\d+)%");
+            return match.Success ? int.Parse(match.Groups[1].Value) : 0;
+        }
+
     }
 }

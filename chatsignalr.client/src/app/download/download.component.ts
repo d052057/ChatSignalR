@@ -52,6 +52,7 @@ export class DownloadComponent {
       audioOnly: this.audioOnly,
       outputFolder: this.outputFolder  // Send the user-provided output folder.
     };
+   /* this.signalRService.invokeMethod('HubStartDownloadControllerAsync', connectionId, payload);*/
     this.signalRService.invokeMethod('HubStartDownloadServiceAsync', payload);
   }
 }
