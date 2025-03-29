@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { SignalrServiceService} from './signalr-service.service';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-download',
@@ -17,7 +16,6 @@ export class DownloadComponent {
   progress: string = '';
   error: string = '';
   signalRService = inject(SignalrServiceService);
-  http = inject(HttpClient);
   constructor() {
   }
 
@@ -25,20 +23,19 @@ export class DownloadComponent {
     // Initialize SignalR connection
     this.signalRService.startConnection();
 
-    // Subscribe to real-time progress updates
-    this.signalRService.listenToProgress((progress) => {
-      this.progress = progress;
+    // Subscribe to progress messages
+    this.signalRService.addHandler('ReceiveProgress', (progress: string) => {
+      this.progress = `${progress}`;
     });
 
-    // Subscribe to real-time error updates
-    this.signalRService.listenToError((error) => {
-      this.error += error + '\n';
-      console.error('Received error from server:', error);
+    // Subscribe to error messages
+    this.signalRService.addHandler('ReceiveError', (error: string) => {
+      this.error += `${error}` + "\n\n";
     });
-    this.signalRService.listenToFinish((message) => {
-      console.log("Download finished:", message);
-      // Optionally update UI to show the download is complete, for example:
-      this.progress = message;
+
+    // Subscribe to download finished
+    this.signalRService.addHandler('DownloadFinished', (message: string) => {
+      this.progress = `${message}`;
     });
   }
 
@@ -55,20 +52,6 @@ export class DownloadComponent {
       audioOnly: this.audioOnly,
       outputFolder: this.outputFolder  // Send the user-provided output folder.
     };
-
-
-
-    // Make the POST request to the backend
-    this.http
-      .post(`https://localhost:7132/api/YoutubeDL/start-download?connectionId=${connectionId}`, payload)
-      .subscribe({
-        next: () => {
-          /* this.progress = 'Download started...';*/
-          console.log('Download request accepted.');
-        },
-        error: (err) => {
-          this.error = `Failed to start download: ${err.message}`;
-        },
-      });
+    this.signalRService.invokeMethod('HubStartDownloadServiceAsync', payload);
   }
 }

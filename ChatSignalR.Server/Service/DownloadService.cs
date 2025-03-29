@@ -26,7 +26,7 @@ namespace ChatSignalR.Server.Service
             };
         }
 
-        public async Task StartDownload(string connectionId, string url, bool audioOnly, string outputFolder)
+        public async Task StartDownloadAsync(string connectionId, string url, bool audioOnly, string outputFolder)
         {
             try
             {

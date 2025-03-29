@@ -10,10 +10,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Include="Hubs\DownloadHubscs" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.3.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
@@ -43,5 +39,9 @@
 
 	<ItemGroup>
 		<Folder Include="wwwroot\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Hubs\DownloadHubs.cs" />
 	</ItemGroup>
 </Project>

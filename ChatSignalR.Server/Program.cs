@@ -24,7 +24,6 @@ builder.Services.AddSignalR(opt =>
     opt.EnableDetailedErrors = true; 
     });
 builder.Services.AddSingleton<DownloadService>(); // Registers the DownloadService as a singleton
-
 builder.Services.AddHttpContextAccessor(); // Required for accessing HTTP context, like connection IDs
 builder.Services.AddCors();
 builder.Services.AddControllers();
@@ -37,8 +36,13 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors(opt =>
 {
-//opt.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-    opt.WithOrigins("https://localhost:50968", "https://127.0.0.1:50968")
+    //opt.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    opt.WithOrigins(
+        "https://localhost:50968", 
+        "https://127.0.0.1:50968",
+        "http://localhost:50968",
+        "http://127.0.0.1:50968"
+        )
        .AllowAnyHeader()
        .AllowAnyMethod()
        .AllowCredentials(); // Required if credentials are sent

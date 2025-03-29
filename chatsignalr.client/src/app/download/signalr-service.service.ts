@@ -14,7 +14,8 @@ export class SignalrServiceService {
   }
 
   startConnection(): void {
-    /*const hubUrl = `${window.location.origin}/downloadHub`;*/
+    let intervalId: any;
+    //  const hubUrl = `${window.location.origin}/downloadHub`;
     const hubUrl = "https://localhost:7132/downloadHub";
     // Initialize the SignalR connection
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -33,12 +34,13 @@ export class SignalrServiceService {
           .then((id: string) => {
             this.connectionId = id;
             console.log(`Connection ID retrieved: ${this.connectionId}`);
+            clearInterval(intervalId); // Stop logging when connected
           })
           .catch(err => console.error('Error retrieving Connection ID:', err));
       })
       .catch(err => {
         console.error('Error while starting SignalR connection:', err);
-        setTimeout(
+        intervalId = setTimeout(
           () => this.startConnection()
           , 2000); // Retry after 2 seconds
       });
@@ -57,9 +59,9 @@ export class SignalrServiceService {
     });
 
     // Periodic connection state logging
-    setInterval(() => {
-      console.log(`SignalR connection state: ${this.hubConnection.state}`);
-    }, 1000);
+    //setInterval(() => {
+    //  console.log(`SignalR connection state: ${this.hubConnection.state}`);
+    //}, 1000);
   }
 
   listenToProgress(callback: (progress: string) => void): void {
@@ -75,23 +77,23 @@ export class SignalrServiceService {
   }
 
   listenToFinish(callback: (finish: string) => void): void {
-    this.hubConnection.on('DownloadFinished', (message: string) => {
-      callback(message);
-    });
+  this.hubConnection.on('DownloadFinished', (message: string) => {
+    callback(message);
+  });
+}
+
+  async invokeMethod(methodName: string, ...args: any[]): Promise < void> {
+  try {
+    /* alert("invokeMethod: " + methodName);*/
+    return await this.hubConnection.invoke(methodName, ...args);
+  } catch(err) {
+    console.error(`Error invoking method '${methodName}':`, err);
+    throw err;
   }
+}
 
-  //async invokeMethod(methodName: string, ...args: any[]): Promise<void> {
-  //  try {
-  //        alert("invokeMethod: " + methodName);
-  //        return await this.hubConnection.invoke(methodName, ...args);
-  //    } catch (err) {
-  //        console.error(`Error invoking method '${methodName}':`, err);
-  //        throw err;
-  //    }
-  //}
-
-  //addHandler(eventName: string, callback: (...args: any[]) => void): void {
-  //  this.hubConnection.on(eventName, callback);
-  //  console.log(`Handler added for event: ${eventName}`);
-  //}
+addHandler(eventName: string, callback: (...args: any[]) => void): void {
+  this.hubConnection.on(eventName, callback);
+  console.log(`Handler added for event: ${eventName}`);
+}
 }

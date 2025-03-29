@@ -11,7 +11,7 @@ namespace ChatSignalR.Server.Controllers
         private readonly DownloadService _downloadService = downloadService;
 
         [HttpPost("start-download")]
-        public async Task<IActionResult> StartDownload([FromBody] DownloadRequest request)
+        public async Task<IActionResult> StartDownloadAsync([FromBody] DownloadRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Url))
             {
@@ -29,7 +29,7 @@ namespace ChatSignalR.Server.Controllers
             }
 
             // Start the download using the service
-            await _downloadService.StartDownload(connectionId, request.Url, request.AudioOnly, request.OutputFolder);
+            await _downloadService.StartDownloadAsync(connectionId, request.Url, request.AudioOnly, request.OutputFolder);
 
             // Return a response confirming the download has started
             return Ok(new { Message = "Download started successfully." });
